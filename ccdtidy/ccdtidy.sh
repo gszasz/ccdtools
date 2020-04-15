@@ -1,37 +1,55 @@
 #!/bin/bash
-#########################################################################
-#									#
-# 	ccdtidy				        Version: 0.1		#
-#									#
-# 	Author: Gabriel Szasz			19.12.2004		#
-#									#
-#	Copyright (C) 2004 Hlohovec Observatory                         #
-#									#
-#  Utility for correcting filename and header of each FITS FILE         #
-#  according to Hlohovec Observatory standards.                         #
-#  -------------------------------------------------------------------  #
-#  Standard filename pattern of CCD FITS files at Hlohovec Observatory  #
-#  compounds from two parts: prefix and suffix.                         #
-#                                                                       #
-#           OBJECT-YYYY-MM-DD-NNN[F].fit[s]                             #
-#           |-----prefix----| |-sx-|                                    #
-#                                                                       #
-#    OBJECT      name of observed object (without spaces)               #
-#    YYYY-MM-DD  evening date of the observation                        #
-#    NNN         suffix number of the image (three digits)              #
-#    F           filter letter (not used for clear filter and           #
-#                  dark frames)                                         #
-#  -------------------------------------------------------------------  #
-#  Standard header of CCD FITS files at Hlohovec Observatory contains   #
-#  following special keys:                                              #
-#                                                                       #
-#      OBJECT    name of observed object                                #
-#      NOTE      used filter                                            #
-#      OBSERVER  list of observers                                      #
-#      TELESCOP  used telescope                                         #
-#      DEVICE    used CCD camera                                        #
-#									#
-#########################################################################
+#
+# ccdtidy.sh -- Correct filename and header of each FITS file
+#
+# Copyright (C) 2004, 2020  Gabriel Szasz <gabriel.szasz1@gmail.com>
+#
+# This file is part of 'ccdtools`.
+#
+# The `ccdtools` is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# The 'ccdtools' is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# The 'ccdtidy.sh' is a utility for correcting filename and header of each FITS
+# FILE according to Hlohovec Observatory standards.
+#
+# Standard filename pattern of CCD FITS files at Hlohovec Observatory consists
+# of two parts: prefix and suffix.
+#
+#     OBJECT-YYYY-MM-DD-NNN[F].fit[s]
+#     |-----prefix----| |-sx-|
+#
+#     OBJECT      name of observed object (without spaces)
+#     YYYY-MM-DD  evening date of the observation
+#     NNN         suffix number of the image (three digits)
+#     F           filter letter (not used for clear filter and dark frames)
+#
+# Standard header of CCD FITS files at Hlohovec Observatory contains following
+# special keys:
+#
+#     OBJECT    name of observed object
+#     NOTE      used filter
+#     OBSERVER  list of observers
+#     TELESCOP  used telescope
+#     DEVICE    used CCD camera
+#
+
+# Version information
+script="ccdtidy.sh"
+package="ccdtools"
+version="0.1"
+author="Gabriel Szasz"
+copyright_year="2004, 2020"
+copyright="Gabriel Szasz <gabriel.szasz1@gmail.com>"
 
 # Default settings
 files=`ls *.fit *.fits`
@@ -63,7 +81,7 @@ while [ -n "$1" ]; do
     echo -e "Standard filename structure of CCD FITS files at Hlohovec Observatory"
     echo -e "consists of two parts: prefix and suffix.\n"
     echo -e "\t\tOBJECT-YYYY-MM-DD-NNN[F].fit[s]"
-    echo -e "\t\t|-----prefix----| |-sx-|\n"    
+    echo -e "\t\t|-----prefix----| |-sx-|\n"
     echo -e "  OBJECT\tname of observed object (without spaces)"
     echo -e "  YYYY-MM-DD\tevening date of the observation"
     echo -e "  NNN\t\tsuffix number of the image (three digits)"
@@ -99,9 +117,9 @@ while [ -n "$1" ]; do
     shift
     device="$1"
   elif [ "$1" = "--version" ]; then
-    echo -e "ccdtidy (ccdtools) 0.1"
-    echo -e "Written by Gabriel Szasz.\n"
-    echo -e "Copyright (C) 2004 Hlohovec Observatory"
+    echo -e "$script ${package:+($package) }$version"
+    echo -e "Written by $author.\n"
+    echo -e "Copyright (C) $copyright_year  $copyright"
     exit 0
   else
     files=$*
@@ -146,7 +164,7 @@ fi
 #automatic numbering
 if [ "$auto_numbering" = "true" ]; then
   for file in $files ; do
-    fitshead $file | grep 
+    fitshead $file | grep
     # Get raw filename and file extension
     raw_file=`echo $file | cut -d '.' -f 1`
     extension=`echo $file | cut -d '.' -f 2`
@@ -179,7 +197,7 @@ for file in $files ; do
   extension=`echo $file | cut -d '.' -f 2`
 
   if [ "$extension" = "fit" -o "$extension" = "fits" ]; then
-   
+
     # Get information from FITS header
     fitshead $file > $header_file
     # date and time
@@ -191,60 +209,60 @@ for file in $files ; do
     if [ $hour -lt 11 ]; then
       date=`date -d "yesterday $date" -I`
     fi
-    
+
     # compute UNIX time
     unix_time=`date -d "$date $time" +%s`
 
     # Object variable initialization
-    if [ -z "$change_object" ]; then 
+    if [ -z "$change_object" ]; then
       object=""
     fi
-    
+
     # Letter variable initialization
-    if [ -z "$change_letter" ]; then 
+    if [ -z "$change_letter" ]; then
       letter=""
     fi
-  
+
     # Get filename prefix and suffix
     prefix=`echo $raw_file | gawk -F '-' '{ for(i=1;i<NF-1;i++) { printf "%s-", $i } printf "%s", $i }'`
     suffix=`echo $raw_file | gawk -F '-' '{ print $NF }'`
-    
+
     # Analyze file prefix
     nf=`echo $prefix | gawk -F '-' '{ print NF }'`
-    
+
     # Analyze file suffix
     num=`echo $suffix | sed 's/^.*\([0-9]*\).*$/\1/'`
-    if [ -z "$letter" ]; then      
+    if [ -z "$letter" ]; then
       letter=`echo $suffix | sed 's/^.*[0-9]*\(.*\)$/\1/'`
-    fi  
-    
+    fi
+
     # Set object in file prefix
     if [ -z $object ]; then
       object=`echo $prefix | cut -d '-' -f 1`
-    fi  
-    
-    # Set date in file prefix    
+    fi
+
+    # Set date in file prefix
     if [ $nf -eq 4 -a -z "$obs_date" ]; then
       obs_date=`echo $prefix | gawk -F '-' '{ printf "%4d-%02d-%02d", $2, $3, $4 }'`
-    fi  
-        
+    fi
+
     # Create new (compound) prefix if possible
     if [ -n "$obs_date" ]; then
       new_prefix="$object-$obs_date"
     else
-      new_prefix="$object"  
+      new_prefix="$object"
     fi
-    
+
     # Create new suffix
     if [ -z "$letter" -o "$clear_letter" = "true" -o "$object" = "dark" ]; then
       new_suffix=$(printf "%03d" `expr $num - $offset`)
     else
       new_suffix=$(printf "%03d%s" `expr $num - $offset` $letter)
-    fi  
+    fi
 
     # Create new filename
     new_file="$new_prefix-$new_suffix.fit"
-    
+
     # Rename the file
     if [ -n "$debug" ]; then
       echo "mv -vi $file $new_file"
@@ -252,6 +270,6 @@ for file in $files ; do
       echo "ccdrename: File '$new_file' already exist."
     else
       mv -v $file $new_file
-    fi  
+    fi
   fi
 done

@@ -1,23 +1,36 @@
 #!/bin/bash
-#########################################################################
-#									#
-# 	ccdrename				Version: 0.9.1		#
-#				.					#
-# 	Author: Gabriel Szasz			29.10.2004		#
-#									#
-#  Rename each FILE due to the standard filename pattern for CCD FITS 	#
-#  files at Hlohovec Observatory. Very useful utility for changing	# 
-#  fields in file prefix and/or for shifting the suffix numbering.	#
-#									#
-#########################################################################
+#
+# ccdrename.sh -- Rename files according to Hlohovec Observatory standards
+#
+# Copyright (C) 2004, 2020  Gabriel Szasz <gabriel.szasz1@gmail.com>
+#
+# This file is part of 'ccdtools`.
+#
+# The `ccdtools` is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# The 'ccdtools' is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# The 'ccdrename.sh' renames each FILE due to the standard filename pattern for
+# CCD FITS files at Hlohovec Observatory.  Very useful utility for changing
+# fields in file prefix and/or for shifting the suffix numbering.
+#
 
 # Version information
-script="ccdrename"
+script="ccdrename.sh"
 package="ccdtools"
 version="0.9.1"
 author="Gabriel Szasz"
-copyright_year="2005"
-copyright="Gabriel Szasz"
+copyright_year="2004, 2020"
+copyright="Gabriel Szasz <gabriel.szasz1@gmail.com>"
 
 # Default settings
 offset=0
@@ -52,7 +65,7 @@ while [ -n "$1" ]; do
       echo -e "Standard filename pattern of CCD FITS files at Hlohovec Observatory"
       echo -e "compounds from two parts: prefix and suffix.\n"
       echo -e "\t\tOBJECT-YYYY-MM-DD-NNN[F][f].fit[s]"
-      echo -e "\t\t|-----prefix----| |--sfx--|\n"    
+      echo -e "\t\t|-----prefix----| |--sfx--|\n"
       echo -e "  OBJECT\tname of observed object (without spaces)"
       echo -e "  YYYY-MM-DD\tevening date of the observation"
       echo -e "  NNN\t\tsuffix number of the image (three digits)"
@@ -63,10 +76,10 @@ while [ -n "$1" ]; do
     --version )
       echo -e "$script ${package:+($package) }$version"
       echo -e "Written by $author.\n"
-      echo -e "Copyright (C) $copyright_year $copyright"
+      echo -e "Copyright (C) $copyright_year  $copyright"
       exit 0
       ;;
-    -g | --debug )     debug=true                                ;; 
+    -g | --debug )     debug=true                                ;;
     -o | --object )    shift; object="$1"; change_object=true    ;;
     -d | --date )      shift; obs_date=`echo $1 | gawk -F '-' '{ printf "%4d-%02d-%02d", $1, $2, $3 }'` ;;
     -n | --num-offset) shift; offset="$1"                        ;;
@@ -98,7 +111,7 @@ if $check_offset ; then
     if [ "$extension" = "fit" -o "$extension" = "fits" ]; then
       # Get filename prefix and suffix
       suffix=`echo $raw_file | gawk -F '-' '{ print $NF }'`
-    
+
       # Analyze file suffix
       num="$(echo $suffix | sed 's/\([0-9]*\)[^0-9]*/\1/')"
       break
@@ -122,24 +135,24 @@ for file in $files ; do
   extension=`echo $file | cut -d '.' -f 2`
 
   if [ "$extension" = "fit" -o "$extension" = "fits" ]; then
-   
+
     # Object variable initialization
-    if [ -z "$change_object" ]; then 
+    if [ -z "$change_object" ]; then
       object=""
     fi
-    
+
     # Letter variable initialization
-    if [ -z "$change_letter" ]; then 
+    if [ -z "$change_letter" ]; then
       letter=""
     fi
-  
+
     # Get filename prefix and suffix
     prefix=`echo $raw_file | gawk -F '-' '{ for(i=1;i<NF-1;i++) { printf "%s-", $i } printf "%s", $i }'`
     suffix=`echo $raw_file | gawk -F '-' '{ print $NF }'`
-    
+
     # Analyze file prefix
     nf="$(echo $prefix | gawk -F '-' '{ print NF }')"
-    
+
     # Analyze file suffix
     num="$(echo $suffix | sed 's/\([0-9]*\)[^0-9]*/\1/')"
     flags="$(echo $suffix | sed 's/[0-9]*\([^0-9]*\)/\1/')"
@@ -153,7 +166,7 @@ for file in $files ; do
     # Get GEM flip state flag from original suffix if not forced
     if ! $change_flip_flag ; then
       [ -n "$(echo $flags | grep f)" ] && flipped=true || flipped=false
-    fi   
+    fi
 
     # Change object name due to deprecated suffix letter (compatibility stuff)
     if [ "$letter" = "F" ]; then
@@ -167,20 +180,20 @@ for file in $files ; do
     # Set object in file prefix
     if [ -z $object ]; then
       object=`echo $prefix | cut -d '-' -f 1`
-    fi  
-    
-    # Set date in file prefix    
+    fi
+
+    # Set date in file prefix
     if [ $nf -eq 4 -a -z "$obs_date" ]; then
       obs_date=`echo $prefix | gawk -F '-' '{ printf "%4d-%02d-%02d", $2, $3, $4 }'`
-    fi  
-        
+    fi
+
     # Create new (compound) prefix if possible
     if [ -n "$obs_date" ]; then
       new_prefix="$object-$obs_date"
     else
-      new_prefix="$object"  
+      new_prefix="$object"
     fi
-    
+
     # Create new suffix
     new_suffix=$(printf "%04d" `expr $num - $offset`)
 
@@ -196,7 +209,7 @@ for file in $files ; do
 
     # Create new filename
     new_file="$new_prefix-$new_suffix.fit"
-    
+
     # Rename the file
     if [ -n "$debug" ]; then
       echo "mv -vi $file $new_file"

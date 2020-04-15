@@ -1,23 +1,42 @@
 #!/bin/bash
-#########################################################################
-#									#
-# 	ccdhelcor			        Version: 0.2		#
-#									#
-# 	Author: Gabriel Szasz			20.12.2004		#
-#									#
-#	Copyright (C) 2004 Hlohovec Observatory                         #
-#									#
-#  Utility for heliocentric correction of Julian Date in light curve    #
-#  data files.                                                          #
-#                                                                       #
-#  Used backend 'helcor' (part of C-Munipack package)                   #
-#  was created by David Motl (2004).                                    #
-#                                                                       #
-#  Coordinates of observed object are read from central catalog file:   #
-#                                                                       #
-#      /usr/local/share/ccdtools/catalog                                #
-#									#
-#########################################################################
+#
+# ccdhelcor.sh -- Perform heliocentric correction of JD in the LC data files
+#
+# Copyright (C) 2004, 2020  Gabriel Szasz <gabriel.szasz1@gmail.com>
+#
+# This file is part of the 'ccdtools' package.
+#
+# The 'ccdtools' package is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# The 'ccdtools' package is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# the 'ccdtools' package.  If not, see <http://www.gnu.org/licenses/>.
+#
+# The 'ccdhelcor.sh' is a utility for heliocentric correction of Julian Date in
+# light curve data files.
+#
+# Used backend 'helcor' (part of C-Munipack package) was created by David Motl
+# (2004).
+#
+# Coordinates of observed object are read from the central catalog file:
+#
+#   /usr/local/share/ccdtools/catalog
+#
+
+# Version information
+script="ccdhelcor.sh"
+package="ccdtools"
+version="0.2"
+author="Gabriel Szasz"
+copyright_year="2004, 2020"
+copyright="Gabriel Szasz <gabriel.szasz1@gmail.com>"
 
 # Catalog path
 ccd_root=/usr/local/share/ccdtools
@@ -54,9 +73,9 @@ while [ -n "$1" ]; do
     object="$1"
     force_object=true
   elif [ "$1" = "--version" ]; then
-    echo -e "ccdhelcor (ccdtools) 0.2"
-    echo -e "Written by Gabriel Szasz.\n"
-    echo -e "Copyright (C) 2004 Hlohovec Observatory"
+    echo -e "$script ${package:+($package) }$version"
+    echo -e "Written by $author.\n"
+    echo -e "Copyright (C) $copyright_year  $copyright"
     exit 0
   else
     files=$*
@@ -91,7 +110,7 @@ for file in $files ; do
 
   if [ "$force_object" = "false" ]; then
     object=`echo $file | cut -d '-' -f 1`
-    if [ ! "$object" = "$prev_object" ]; then      
+    if [ ! "$object" = "$prev_object" ]; then
       record=`grep $object $catalog_file`
       if [ -z "$record" ]; then
 	echo "ccdhelcor: $file: Object '$object' not found in catalog"

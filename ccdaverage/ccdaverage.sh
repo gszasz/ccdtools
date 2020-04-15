@@ -1,31 +1,50 @@
 #!/bin/bash
-#########################################################################
-#									#
-# 	ccdaverage		                Version: 0.1  		#
-#									#
-# 	Author: Gabriel Szasz			1.5.2005		#
-#									#
-#	Copyright (C) 2005 Hlohovec Observatory                         #
-#								        #
-#  Utility for creating averaged light curve datafiles using various    #
-#  methods including running averages and phase binning.		#
-#                                                                       #
-#  Ephemeris of observed object is read from central catalog file:      #
-#                                                                       #
-#      /usr/local/share/ccdtools/catalog                                #
-#                                                                       #
-#  Used backend 'Grace' was created by  Paul J Turner (1991-1995) and   #
-#  today is maintained by Evgeny Stambulchik.				#
-#                                                                       #
-#  Actual source code of 'Grace' (5.1.18) is available on:              # 
-#                                                                       #
-#    ftp://plasma-gate.weizmann.ac.il/pub/grace/src/grace5/             #
-#                                                                       #
-#  Source code of 'Grace 5.1.17-1' (modified version of 'Grace 5.1.17') #
-#  created by Gabriel Szasz (2004), which includes some fancy features  #
-#  in user interface, is distributed with package 'ccdtools'            #
-#	                                                                #
-#########################################################################
+#
+# ccdaverage.sh -- Create averaged light curve datafiles
+#
+# Copyright (C) 2005, 2020  Gabriel Szasz <gabriel.szasz1@gmail.com>
+#
+# This file is part of the 'ccdtools' package.
+#
+# The 'ccdtools' package is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# The 'ccdtools' package is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# the 'ccdtools' package.  If not, see <http://www.gnu.org/licenses/>.
+#
+# The 'ccdaverage.sh' is a utility for creating averaged light curve datafiles
+# using various methods including running averages and phase binning.
+#
+# Ephemeris of observed object is read from central catalog file:
+#
+#     /usr/local/share/ccdtools/catalog
+#
+# Used backend 'Grace' was created by Paul J Turner (1991-1995) and today is
+# maintained by Evgeny Stambulchik.
+#
+# Actual source code of 'Grace' (5.1.18) is available on:
+#
+#     ftp://plasma-gate.weizmann.ac.il/pub/grace/src/grace5/
+#
+# Source code of 'Grace 5.1.17-1' (modified version of 'Grace 5.1.17' created by
+# Gabriel Szasz (2004), which includes some fancy features in user interface, is
+# distributed along with the 'ccdtools' package.
+#
+
+# Version information
+script="ccdaverage.sh"
+package="ccdtools"
+version="0.1"
+author="Gabriel Szasz"
+copyright_year="2005, 2020"
+copyright="Gabriel Szasz <gabriel.szasz1@gmail.com>"
 
 # Catalog path
 ccd_root=/usr/local/share/ccdtools
@@ -43,10 +62,10 @@ files=`echo *-var-hc.dat`
 
 # Argument processing
 while [ -n "$1" ]; do
-  case $1 in 
+  case $1 in
     -h | --help )
       echo -e "Usage: ccdphase [OPTIONS]... [FILE]..."
-      echo -e "Utility for creating averaged lightcurve data file from" 
+      echo -e "Utility for creating averaged lightcurve data file from"
       echo -e "each FILE (or *-var.dat if no files are named)\n"
       echo -e "  -g, --debug\t\t\tdebug mode (echo commands only)"
       echo -e "  -r, --runavg NUMBER\t\trunning average using NUMBER of points"
@@ -55,20 +74,20 @@ while [ -n "$1" ]; do
       echo -e "  -h, --help \t\t\tdisplay this help and exit"
       echo -e "      --version\t\t\toutput version information and exit\n"
       echo -e "Default behavior: compute running averages for data files using 10 points\n"
-      echo -e "Files matching masks '*-cmp-*.dat', '*-phase.dat', '*-ravg.dat' and" 
+      echo -e "Files matching masks '*-cmp-*.dat', '*-phase.dat', '*-ravg.dat' and"
       echo -e "and '*-pbin.dat' (output files the 'ccdtools' utilities) will be skipped.\n"
       echo -e "Object name is obtained from filename structure according to Hlohovec"
-      echo -e "Observatory standards, unless not specified explicitly using '-o' argument.\n" 
-      echo -e "Files not complying Hlohovec Observatory standards and particular output files" 
+      echo -e "Observatory standards, unless not specified explicitly using '-o' argument.\n"
+      echo -e "Files not complying Hlohovec Observatory standards and particular output files"
       echo -e "of ccdtools utilities are automatically skipped.\n"
       echo -e "Ephemeris of object is read from central catalog file:\n"
       echo -e "    /usr/local/share/ccdtools/catalog\n"
       exit 0
       ;;
     --version )
-      echo -e "ccdaverage (ccdtools) 0.1"
-      echo -e "Written by Gabriel Szasz.\n"
-      echo -e "Copyright (C) 2005 Hlohovec Observatory"
+      echo -e "$script ${package:+($package) }$version"
+      echo -e "Written by $author.\n"
+      echo -e "Copyright (C) $copyright_year  $copyright"
       exit 0
       ;;
     -g | --debug )     debug=true                                     ;;
@@ -89,7 +108,7 @@ for file in $files ; do
     continue
   fi
   # Skip particular output files of ccdtools utilities
-  if [ -n "$(echo $file_flag | grep '\(cmp\|phase\|ravg\|pbin\)')" ]; then 
+  if [ -n "$(echo $file_flag | grep '\(cmp\|phase\|ravg\|pbin\)')" ]; then
     continue
   fi
 
@@ -102,7 +121,7 @@ for file in ${input_files[*]} ; do
 
   if [ "$method" = "phasebin" ]; then
 
-    if [ ! $force_object ] ; then 
+    if [ ! $force_object ] ; then
       file_object="$(echo $file | sed 's/\(^.*\)-[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}.*\.dat$/\1/')"
     fi
 
@@ -156,7 +175,7 @@ EOF
       echo "gawk \\"
       echo "  'BEGIN { prev_i = -1;  n = 0; sum_hjd = 0; sum_mag = 0; } \\"
       echo "   { i = int($3 * 10); n++; sum_hjd+=$1; sum_mag+=$2; \\"
-      echo "     if (i != prev_i) { \\" 
+      echo "     if (i != prev_i) { \\"
       echo "       print sum_hjd/n, sum_mag/n; \\"
       echo "       n = 0; sum_hjd = 0; sum_mag = 0; \\"
       echo "     } \\"

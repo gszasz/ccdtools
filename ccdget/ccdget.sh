@@ -1,23 +1,42 @@
 #!/bin/bash
-#########################################################################
-#									#
-# 	ccdget			                Version: 0.1		#
-#									#
-# 	Author: Gabriel Szasz			20.12.2004		#
-#									#
-#	Copyright (C) 2004 Hlohovec Observatory                         #
-#									#
-#  Utility for extraction of variable star and/or comparison star data  #
-#  from C-Munipack data files. Heliocentric correction will be          #
-#  automatically applied if the object (object name is extracted from   #
-#  file name) has a record in central catalog file:                     #
-#                                                                       #
-#      /usr/local/share/ccdtools/catalog                                #
-#                                                                       #
-#  Used backend 'helcor' (part of C-Munipack package)                   #
-#  was created by David Motl (2004).                                    #
-#									#
-#########################################################################
+#
+# ccdget.sh -- Extract variable/comparison star data from C-munipack data file
+#
+# Copyright (C) 2004, 2020  Gabriel Szasz <gabriel.szasz1@gmail.com>
+#
+# This file is part of the 'ccdtools' package.
+#
+# The 'ccdtools' package is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# The 'ccdtools' package is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# the 'ccdtools' package.  If not, see <http://www.gnu.org/licenses/>.
+#
+# The 'ccdget.sh' is a utility for extraction of variable star and/or
+# comparison star data from C-Munipack data files.  Heliocentric correction will
+# be automatically applied if the object (object name is extracted from file
+# name) has a record in central catalog file:
+#                                                                     
+#   /usr/local/share/ccdtools/catalog
+#                                                                     
+# Used backend 'helcor' (part of C-Munipack package) was created by David Motl
+# (2004).
+#
+
+# Version information
+script="ccdget.sh"
+package="ccdtools"
+version="0.1"
+author="Gabriel Szasz"
+copyright_year="2004, 2020"
+copyright="Gabriel Szasz <gabriel.szasz1@gmail.com>"
 
 # Catalog path
 ccd_root=/usr/local/share/ccdtools
@@ -61,9 +80,9 @@ while [ -n "$1" ]; do
   elif [ "$1" = "-n" -o "$1" = "--no-delete" ]; then
     no_delete=true
   elif [ "$1" = "--version" ]; then
-    echo -e "ccdget (ccdtools) 0.1"
-    echo -e "Written by Gabriel Szasz.\n"
-    echo -e "Copyright (C) 2004 Hlohovec Observatory"
+    echo -e "$script ${package:+($package) }$version"
+    echo -e "Written by $author.\n"
+    echo -e "Copyright (C) $copyright_year  $copyright"
     exit 0
   else
     files=$*
