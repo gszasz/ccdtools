@@ -1,0 +1,19 @@
+CCD Tools README
+
+Set of tools to handle and archive CCD photometric data according to
+the Hlohovec Observatory standards.
+
+LICENSE
+
+This script is licensed under the terms of the GNU GPL, a copy of
+which you should have received with this package
+
+DEPENDENCIES
+
+  cmunipack v1.1 or newer
+
+INSTALLATION
+
+1. Unpack package
+2. Create links to the binaries at ~/bin
+
